@@ -28,6 +28,7 @@ public class test {
 //        for (int i = 0; i < tipoEstancia.length; i++) {
 //            fechaEstancia[i] = LocalDateTime.now();
 //        }
+//        guarda();
         carga();
         System.out.println(cantidadEstancia);
         for (int i = 0; i < cantidadEstancia; i++) {
@@ -42,28 +43,33 @@ public class test {
         for (int i = 0; i < cantidadEstancia; i++) {
             System.out.println(fechaEstancia[i]);
         }
+
+//        if (nombreEstancia[1].equals("")) {
+//            System.out.println("cocina esta vacio");
+//        }
+
     }
 
     public static void guarda() {
-        File archivo = new File("save.txt");
+        File archivo = new File("src/main/resources/saves/save.txt");
         try {
-            PrintWriter save = new PrintWriter(archivo);
-            save.println(cantidadEstancia);
+            PrintWriter printWriter = new PrintWriter(archivo);
+            printWriter.println(cantidadEstancia);
             for (int i = 0; i < cantidadEstancia; i++) {
-                save.println(tipoEstancia[i]);
+                printWriter.println(tipoEstancia[i]);
             }
             for (int i = 0; i < cantidadEstancia; i++) {
-                save.println(supEstancia[i]);
+                printWriter.println(supEstancia[i]);
             }
             for (int i = 0; i < cantidadEstancia; i++) {
-                save.print(nombreEstancia[i]);
-                save.println();
+                printWriter.print(nombreEstancia[i]);
+                printWriter.println();
             }
             for (int i = 0; i < cantidadEstancia; i++) {
-                save.print(fechaEstancia[i]);
-                save.println();
+                printWriter.print(fechaEstancia[i]);
+                printWriter.println();
             }
-            save.close();
+            printWriter.close();
             System.out.println("Guardado completo.");
         } catch (IOException ioe) {
             System.out.println("Ha habido un error en el guardado.");
@@ -72,7 +78,7 @@ public class test {
 
     public static void carga() {
         try {
-            FileReader fileReader = new FileReader("save.txt");
+            FileReader fileReader = new FileReader("src/main/resources/saves/save.txt");
             BufferedReader bufferedReader = new BufferedReader(fileReader);
 
             String linea;
