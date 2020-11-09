@@ -29,7 +29,7 @@ public class AspiraDaw {
         boolean continua = true;
         int opcion;
         
-        inicializaVivienda();        
+        iniciaVivienda();        
         while (continua){
             opcion = menuPrincipal();
             switch (opcion){
@@ -48,7 +48,7 @@ public class AspiraDaw {
         }
     }
 
-    public static void inicializaVivienda() {
+    public static void iniciaVivienda() {
         String path = "src/main/resources/saves/";
         String archivo = "save.txt";
         boolean errorArchivo = false;
@@ -137,7 +137,7 @@ public class AspiraDaw {
             switch (opcion){
                 case 0:
                     repite = false;
-                    guarda();
+                    guardaVivienda();
                     break;
                 case 1:
                     JOptionPane.showConfirmDialog(null, "Gracias por usar AspiraDaw!", "Hasta la próxima", JOptionPane.DEFAULT_OPTION);
@@ -147,7 +147,7 @@ public class AspiraDaw {
         }
     }
     
-    public static void guarda(){
+    public static void guardaVivienda(){
         File archivo = new File("src/main/resources/saves/save.txt");
         try {
             PrintWriter printWriter = new PrintWriter(archivo);
