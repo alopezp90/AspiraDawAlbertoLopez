@@ -1,22 +1,22 @@
 package programa;
 
-import javax.swing.ImageIcon;
 import java.time.LocalDateTime;
 import java.io.*;
 import javax.swing.JOptionPane;
+import javax.swing.ImageIcon;
 
 /**
- * @author Alberto López Puertas 
+ * @author Alberto López Puertas
  * <alopezp90@gmail.com>
  */
-public class AspiraDaw {
-    
-    //Inicialización de variables
+public class AspiraDawPrueba {
+
     public static int bateria, cantidadEstancia;
+    public static int[] tipoEstancia, supEstancia;
+    public static String[] nombreEstancia;
+    public static LocalDateTime[] fechaEstancia;
     public static boolean[] estadoEstancia;
-    public static Estancia[] estancia;
     
-    //Inicialización de los iconos para los menús de JOption
     public static final ImageIcon ICONO = new ImageIcon("src/main/resources/icon/icon_96x.jpg");
     public static final ImageIcon ALERT = new ImageIcon("src/main/resources/icon/alert_96x.jpg");
     public static final ImageIcon CONFIG = new ImageIcon("src/main/resources/icon/settings_96x.jpg");
@@ -24,68 +24,85 @@ public class AspiraDaw {
     public static final ImageIcon BAT30 = new ImageIcon("src/main/resources/icon/battery30_96x.jpg");
     public static final ImageIcon BAT60 = new ImageIcon("src/main/resources/icon/battery60_96x.jpg");
     public static final ImageIcon BAT90 = new ImageIcon("src/main/resources/icon/battery90_96x.jpg");
-    
-    //Estructura lógica principal del programa
+
     public static void main(String[] args) {
+        boolean continua = true;
+        int opcion;
         
-    iniciaVivienda();        
-        switch (menuPrincipal()){
-            case 0:
-                modoLimpieza();
-                break;
-            case 1:
-                modoCarga();
-                break;
-            case 2:
-                configuracion();
-                break;
-            default:
-                menuSalir();
+        iniciaVivienda();        
+        while (continua){
+            opcion = menuPrincipal();
+            switch (opcion){
+                case 0:
+                    modoLimpieza();
+                    break;
+                case 1:
+                    modoCarga();
+                    break;
+                case 2:
+                    configuracion();
+                    break;
+                default:
+                    menuSalir();
+            }
         }
     }
-    
-    public static void iniciaVivienda() {
-        String ruta = "src/main/resources/saves/";
-        String archivo = "save.txt";
-        boolean errorArchivo;
-        do {
-            try {
-                FileReader fileReader = new FileReader(ruta + archivo);
-                BufferedReader bufferedReader = new BufferedReader(fileReader);
-                
-                bateria = Integer.parseInt(bufferedReader.readLine());
-                
-                cantidadEstancia = Integer.parseInt(bufferedReader.readLine());
-                
-                estancia = new Estancia[cantidadEstancia];
 
+    public static void iniciaVivienda() {
+        String path = "src/main/resources/saves/";
+        String archivo = "save.txt";
+        boolean errorArchivo = false;
+        while (!errorArchivo) {
+            try {
+                FileReader fileReader = new FileReader(path + archivo);
+                BufferedReader bufferedReader = new BufferedReader(fileReader);
+
+                String linea;
+                
+                linea = bufferedReader.readLine();
+                bateria = Integer.parseInt(linea);
+                
+                linea = bufferedReader.readLine();
+                cantidadEstancia = Integer.parseInt(linea);
+
+                tipoEstancia = new int[cantidadEstancia];
                 for (int i = 0; i < cantidadEstancia; i++) {
-                    estancia[i].tipo = Integer.parseInt(bufferedReader.readLine());
-                    estancia[i].superficie = Integer.parseInt(bufferedReader.readLine());
-                    estancia[i].nombre = bufferedReader.readLine();
-                    estancia[i].fecha = LocalDateTime.parse(bufferedReader.readLine());
+                    linea = bufferedReader.readLine();
+                    tipoEstancia[i] = Integer.parseInt(linea);
                 }
-                errorArchivo = false;
-                System.out.println("Se ha cargado "+archivo);
+                supEstancia = new int[cantidadEstancia];
+                for (int i = 0; i < cantidadEstancia; i++) {
+                    linea = bufferedReader.readLine();
+                    supEstancia[i] = Integer.parseInt(linea);
+                }
+                nombreEstancia = new String[cantidadEstancia];
+                for (int i = 0; i < cantidadEstancia; i++) {
+                    nombreEstancia[i] = bufferedReader.readLine();
+                }
+                fechaEstancia = new LocalDateTime[cantidadEstancia];
+                for (int i = 0; i < cantidadEstancia; i++) {
+                    linea = bufferedReader.readLine();
+                    fechaEstancia[i] = LocalDateTime.parse(linea);
+                }
+                break;
             } catch (IOException ioe) {
                 System.out.println("Ha habido un error en la carga, se intentará cargar vivienda por defecto.");
                 if (archivo.equals("default.txt")) {
                     System.out.println("Se ha producido un error al cargar la vivienda por defecto. Defina vivienda nueva en menú de configuración");
-                    break;
+                    errorArchivo = true;
                 }
                 archivo = "default.txt";
-                errorArchivo = true;
             } catch (NullPointerException e) {
                 System.out.println("Ha habido un error NullPointerException, se intentará cargar vivienda por defecto.");
                 if (archivo.equals("default.txt")) {
                     System.out.println("Se ha producido un error al cargar la vivienda por defecto. Defina vivienda nueva en menú de configuración");
-                    break;
+                    errorArchivo = true;
                 }
                 archivo = "default.txt";
-                errorArchivo = true;
             }
-        } while (!errorArchivo);
+        }
     }
+    
     
     public static int menuPrincipal() {
         int opcion = 3;
@@ -105,10 +122,10 @@ public class AspiraDaw {
         
     }
     
-    public static boolean menuSalir(){
+    public static void menuSalir(){
         int opcion;
         boolean repite = true;
-        do {
+        while (repite) {
             opcion = JOptionPane.showOptionDialog(
                     null, 
                     "Indique qué desea hacer:", 
@@ -127,21 +144,28 @@ public class AspiraDaw {
                     repite = false;
                     break;
             }
-        } while (repite);
-        return true;
+        }
     }
     
-    public static void guardaVivienda(){ //testear
+    public static void guardaVivienda(){
         File archivo = new File("src/main/resources/saves/save.txt");
         try {
             PrintWriter printWriter = new PrintWriter(archivo);
             printWriter.println(bateria);
             printWriter.println(cantidadEstancia);
-            for (int i = 0; i < cantidadEstancia; i++) { //probar impresion de objetos
-                printWriter.println(estancia[i].tipo);
-                printWriter.println(estancia[i].superficie);
-                printWriter.println(estancia[i].nombre);
-                printWriter.println(estancia[i].fecha);
+            for (int i = 0; i < cantidadEstancia; i++) {
+                printWriter.println(tipoEstancia[i]);
+            }
+            for (int i = 0; i < cantidadEstancia; i++) {
+                printWriter.println(supEstancia[i]);
+            }
+            for (int i = 0; i < cantidadEstancia; i++) {
+                printWriter.print(nombreEstancia[i]);
+                printWriter.println();
+            }
+            for (int i = 0; i < cantidadEstancia; i++) {
+                printWriter.print(fechaEstancia[i]);
+                printWriter.println();
             }
             printWriter.close();
             System.out.println("Guardado completo.");
@@ -149,5 +173,6 @@ public class AspiraDaw {
             System.out.println("Ha habido un error en el guardado.");
         }
     }
+    
 
 }
