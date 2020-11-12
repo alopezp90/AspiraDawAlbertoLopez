@@ -45,46 +45,43 @@ public class AspiraDaw {
     }
     
     public static void iniciaVivienda() {
+        int tmpTipo, tmpSuperficie;
+        String tmpNombre;
+        LocalDateTime tmpFecha;
         String ruta = "src/main/resources/saves/";
         String archivo = "save.txt";
-        boolean errorArchivo;
-        do {
-            try {
-                FileReader fileReader = new FileReader(ruta + archivo);
-                BufferedReader bufferedReader = new BufferedReader(fileReader);
-                
-                bateria = Integer.parseInt(bufferedReader.readLine());
-                
-                cantidadEstancia = Integer.parseInt(bufferedReader.readLine());
-                
-                estancia = new Estancia[cantidadEstancia];
 
-                for (int i = 0; i < cantidadEstancia; i++) {
-                    estancia[i].tipo = Integer.parseInt(bufferedReader.readLine());
-                    estancia[i].superficie = Integer.parseInt(bufferedReader.readLine());
-                    estancia[i].nombre = bufferedReader.readLine();
-                    estancia[i].fecha = LocalDateTime.parse(bufferedReader.readLine());
-                }
-                errorArchivo = false;
-                System.out.println("Se ha cargado "+archivo);
-            } catch (IOException ioe) {
-                System.out.println("Ha habido un error en la carga, se intentará cargar vivienda por defecto.");
-                if (archivo.equals("default.txt")) {
-                    System.out.println("Se ha producido un error al cargar la vivienda por defecto. Defina vivienda nueva en menú de configuración");
-                    break;
-                }
-                archivo = "default.txt";
-                errorArchivo = true;
-            } catch (NullPointerException e) {
-                System.out.println("Ha habido un error NullPointerException, se intentará cargar vivienda por defecto.");
-                if (archivo.equals("default.txt")) {
-                    System.out.println("Se ha producido un error al cargar la vivienda por defecto. Defina vivienda nueva en menú de configuración");
-                    break;
-                }
-                archivo = "default.txt";
-                errorArchivo = true;
+        try {
+            FileReader fileReader = new FileReader(ruta + archivo);
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            
+            bateria = Integer.parseInt(bufferedReader.readLine());
+
+            cantidadEstancia = Integer.parseInt(bufferedReader.readLine());
+
+            estancia = new Estancia[cantidadEstancia];
+
+            for (int i = 0; i < cantidadEstancia; i++) {
+                tmpTipo = Integer.parseInt(bufferedReader.readLine());
+                tmpNombre = bufferedReader.readLine();
+                tmpSuperficie = Integer.parseInt(bufferedReader.readLine());
+                tmpFecha = LocalDateTime.parse(bufferedReader.readLine());
+                estancia[i] = new Estancia (tmpTipo, tmpNombre, tmpSuperficie,tmpFecha);
             }
-        } while (!errorArchivo);
+            System.out.println("Carga de "+archivo+" realizada con éxito.");
+            
+        } catch (IOException ioe) {
+            System.out.println("Ha habido un error en la carga, inicializa desde configuración.");
+            if (archivo.equals("default.txt")) {
+                System.out.println("Se ha producido un error al cargar la vivienda por defecto. Defina vivienda nueva en menú de configuración");
+            }
+
+        } catch (NullPointerException e) {
+            System.out.println("Ha habido un error NullPointerException, inicializa desde configuración.");
+            if (archivo.equals("default.txt")) {
+                System.out.println("Se ha producido un error al cargar la vivienda por defecto. Defina vivienda nueva en menú de configuración");
+            }
+        }
     }
     
     public static int menuPrincipal() {
@@ -139,8 +136,8 @@ public class AspiraDaw {
             printWriter.println(cantidadEstancia);
             for (int i = 0; i < cantidadEstancia; i++) { //probar impresion de objetos
                 printWriter.println(estancia[i].tipo);
-                printWriter.println(estancia[i].superficie);
                 printWriter.println(estancia[i].nombre);
+                printWriter.println(estancia[i].superficie);
                 printWriter.println(estancia[i].fecha);
             }
             printWriter.close();
