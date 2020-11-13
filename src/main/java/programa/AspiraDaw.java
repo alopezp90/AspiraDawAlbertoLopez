@@ -2,21 +2,22 @@ package programa;
 
 import javax.swing.ImageIcon;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.io.*;
 import javax.swing.JOptionPane;
+import javax.swing.JLabel;
+import java.util.Arrays;
 
 /**
- * @author Alberto López Puertas 
+ * @author Alberto López Puertas
  * <alopezp90@gmail.com>
  */
 public class AspiraDaw {
-    
-    //Inicialización de variables
-    public static int bateria, cantidadEstancia;
+
+    public static int bateria, cantidadEstancia, posicion;
     public static boolean[] estadoEstancia;
     public static Estancia[] estancia;
-    
-    //Inicialización de los iconos para los menús de JOption
+
     public static final ImageIcon ICONO = new ImageIcon("src/main/resources/icon/icon_96x.jpg");
     public static final ImageIcon ALERT = new ImageIcon("src/main/resources/icon/alert_96x.jpg");
     public static final ImageIcon CONFIG = new ImageIcon("src/main/resources/icon/settings_96x.jpg");
@@ -24,12 +25,13 @@ public class AspiraDaw {
     public static final ImageIcon BAT30 = new ImageIcon("src/main/resources/icon/battery30_96x.jpg");
     public static final ImageIcon BAT60 = new ImageIcon("src/main/resources/icon/battery60_96x.jpg");
     public static final ImageIcon BAT90 = new ImageIcon("src/main/resources/icon/battery90_96x.jpg");
-    
-    //Estructura lógica principal del programa
+
     public static void main(String[] args) {
-        
-    iniciaVivienda();        
-        switch (menuPrincipal()){
+
+        iniciaVivienda();
+        estadoEstancia = new boolean[cantidadEstancia];
+        Arrays.fill(estadoEstancia, false);
+        switch (menuPrincipal()) {
             case 0:
                 modoLimpieza();
                 break;
@@ -43,7 +45,7 @@ public class AspiraDaw {
                 menuSalir();
         }
     }
-    
+
     public static void iniciaVivienda() {
         int tmpTipo, tmpSuperficie;
         String tmpNombre;
@@ -54,10 +56,12 @@ public class AspiraDaw {
         try {
             FileReader fileReader = new FileReader(ruta + archivo);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
-            
+
             bateria = Integer.parseInt(bufferedReader.readLine());
 
             cantidadEstancia = Integer.parseInt(bufferedReader.readLine());
+
+            posicion = Integer.parseInt(bufferedReader.readLine());
 
             estancia = new Estancia[cantidadEstancia];
 
@@ -66,10 +70,10 @@ public class AspiraDaw {
                 tmpNombre = bufferedReader.readLine();
                 tmpSuperficie = Integer.parseInt(bufferedReader.readLine());
                 tmpFecha = LocalDateTime.parse(bufferedReader.readLine());
-                estancia[i] = new Estancia (tmpTipo, tmpNombre, tmpSuperficie,tmpFecha);
+                estancia[i] = new Estancia(tmpTipo, tmpNombre, tmpSuperficie, tmpFecha);
             }
-            System.out.println("Carga de "+archivo+" realizada con éxito.");
-            
+            System.out.println("Carga de " + archivo + " realizada con éxito.");
+
         } catch (IOException ioe) {
             System.out.println("Ha habido un error en la carga, inicializa desde configuración.");
             if (archivo.equals("default.txt")) {
@@ -83,38 +87,46 @@ public class AspiraDaw {
             }
         }
     }
-    
+
     public static int menuPrincipal() {
-        int opcion = 3;
-        
+        int opcion;
+
+        opcion = JOptionPane.showOptionDialog(
+                null,
+                new JLabel(creaEstado()),
+                "Menú Principal",
+                JOptionPane.YES_NO_CANCEL_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                ICONO,
+                new Object[]{"Guardar y salir", "Salir sin guardar"}, null);
         return opcion;
     }
-    
-    public static void modoLimpieza(){
-        
+
+    public static void modoLimpieza() {
+
     }
-    
-    public static void modoCarga(){
-        
+
+    public static void modoCarga() {
+
     }
-    
-    public static void configuracion(){
-        
+
+    public static void configuracion() {
+
     }
-    
-    public static boolean menuSalir(){
+
+    public static boolean menuSalir() {
         int opcion;
         boolean repite = true;
         do {
             opcion = JOptionPane.showOptionDialog(
-                    null, 
-                    "Indique qué desea hacer:", 
+                    null,
+                    "Indique qué desea hacer:",
                     "Hasta la próxima",
                     JOptionPane.YES_NO_CANCEL_OPTION,
                     JOptionPane.QUESTION_MESSAGE,
                     ICONO,
-                    new Object[] { "Guardar y salir", "Salir sin guardar"},null);
-            switch (opcion){
+                    new Object[]{"Guardar y salir", "Salir sin guardar"}, null);
+            switch (opcion) {
                 case 0:
                     repite = false;
                     guardaVivienda();
@@ -127,24 +139,87 @@ public class AspiraDaw {
         } while (repite);
         return true;
     }
-    
-    public static void guardaVivienda(){ //testear
+
+    public static void guardaVivienda() {
         File archivo = new File("src/main/resources/saves/save.txt");
-        try {
-            PrintWriter printWriter = new PrintWriter(archivo);
+
+        try (PrintWriter printWriter = new PrintWriter(archivo)) {
             printWriter.println(bateria);
             printWriter.println(cantidadEstancia);
-            for (int i = 0; i < cantidadEstancia; i++) { //probar impresion de objetos
+            printWriter.println(posicion);
+            for (int i = 0; i < cantidadEstancia; i++) {
                 printWriter.println(estancia[i].tipo);
                 printWriter.println(estancia[i].nombre);
                 printWriter.println(estancia[i].superficie);
                 printWriter.println(estancia[i].fecha);
             }
-            printWriter.close();
             System.out.println("Guardado completo.");
         } catch (IOException ioe) {
             System.out.println("Ha habido un error en el guardado.");
         }
     }
 
+    public static String creaEstado() {
+        String estado, lugar = "";
+        char SIMBOLO = 9670;
+        char COMILLAS = 34;
+
+        if (posicion == -1) {
+            lugar = "la base de carga ";
+        } else {
+            switch (estancia[posicion].tipo) {
+                case 1:
+                    lugar = "el salón " + estancia[posicion].nombre;
+                    break;
+                case 2:
+                    lugar = "la cocina " + estancia[posicion].nombre;
+                    break;
+                case 3:
+                    lugar = "el baño " + estancia[posicion].nombre;
+                    break;
+                case 4:
+                    lugar = "el dormitorio " + estancia[posicion].nombre;
+            }
+
+        }
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm dd-MM-yyyy");
+        LocalDateTime fecha = LocalDateTime.now();
+        String fechaString = fecha.format(formatter);
+
+        estado = "<html>" + SIMBOLO + " Son las " + fechaString + "<br/>"
+                + SIMBOLO + " AspiraDaw se encuentra en " + lugar + " con un " + bateria + "% de batería.<br/><br/>"
+                + SIMBOLO + " Estado de la vivienda:<br/><table border=" + COMILLAS + 0 + COMILLAS + "><tr><td><ul>";
+
+        for (int i = 0; i < estancia.length; i++) {
+            switch (estancia[i].tipo) {
+                case 1:
+                    lugar = " Salón ";
+                    break;
+                case 2:
+                    lugar = " Cocina ";
+                    break;
+                case 3:
+                    lugar = " Baño ";
+                    break;
+                case 4:
+                    lugar = " Dormitorio ";
+            }
+            estado = estado + "<li>" + lugar + "<em>" + estancia[i].nombre + "</em></li>";
+        }
+
+        estado = estado + "</ul></td><td>";
+
+        for (int i = 0; i < estadoEstancia.length; i++) {
+            if (estadoEstancia[i]){
+                estado = estado + "LIMPIO<br/>";
+            } else {
+                estado = estado + "<br>/";
+            }
+        }
+        
+        estado = estado + "</td></table></html>";
+
+        return estado;
+    }
 }
