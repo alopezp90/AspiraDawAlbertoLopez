@@ -98,7 +98,7 @@ public class AspiraDaw {
                 JOptionPane.YES_NO_CANCEL_OPTION,
                 JOptionPane.QUESTION_MESSAGE,
                 ICONO,
-                new Object[]{"Guardar y salir", "Salir sin guardar"}, null);
+                new Object[]{"Modo Carga", "Modo LImpieza", "Configuración", "Salir"}, null);
         return opcion;
     }
 
@@ -180,7 +180,6 @@ public class AspiraDaw {
                 case 4:
                     lugar = "el dormitorio " + estancia[posicion].nombre;
             }
-
         }
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm dd-MM-yyyy");
@@ -189,7 +188,7 @@ public class AspiraDaw {
 
         estado = "<html>" + SIMBOLO + " Son las " + fechaString + "<br/>"
                 + SIMBOLO + " AspiraDaw se encuentra en " + lugar + " con un " + bateria + "% de batería.<br/><br/>"
-                + SIMBOLO + " Estado de la vivienda:<br/><table border=" + COMILLAS + 0 + COMILLAS + "><tr><td><ul>";
+                + SIMBOLO + " Estado de la vivienda:<br/><table><tr><td><ul>";
 
         for (int i = 0; i < estancia.length; i++) {
             switch (estancia[i].tipo) {
@@ -212,13 +211,13 @@ public class AspiraDaw {
 
         for (int i = 0; i < estadoEstancia.length; i++) {
             if (estadoEstancia[i]){
-                estado = estado + "LIMPIO<br/>";
+                estado = estado + " ---> <font color='green'>LIMPIO</font><br/>";
             } else {
-                estado = estado + "<br>/";
+                estado = estado + " ---> <font color='green'>LIMPIO</font><br/>";
             }
         }
         
-        estado = estado + "</td></table></html>";
+        estado = estado + "</td><tr/></table></html>";
 
         return estado;
     }
