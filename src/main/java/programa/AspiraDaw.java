@@ -17,6 +17,7 @@ public class AspiraDaw {
     public static int bateria, cantidadEstancia, posicion;
     public static boolean[] estadoEstancia;
     public static Estancia[] estancia;
+    public static String mensaje;
 
     public static final ImageIcon ICONO = new ImageIcon("src/main/resources/icon/icon_96x.jpg");
     public static final ImageIcon ALERT = new ImageIcon("src/main/resources/icon/alert_96x.jpg");
@@ -75,16 +76,24 @@ public class AspiraDaw {
             System.out.println("Carga de " + archivo + " realizada con éxito.");
 
         } catch (IOException ioe) {
-            System.out.println("Ha habido un error en la carga, inicializa desde configuración.");
+            mensaje = "Ha habido un error en la carga, inicializa desde configuración.";
+            System.out.println(mensaje);
             if (archivo.equals("default.txt")) {
-                System.out.println("Se ha producido un error al cargar la vivienda por defecto. Defina vivienda nueva en menú de configuración");
+                mensaje = "Se ha producido un error al cargar la vivienda por defecto. Defina vivienda nueva en menú de configuración";
+                System.out.println(mensaje);
             }
+            mensajeError(mensaje);
+            configuracion();
 
         } catch (NullPointerException e) {
-            System.out.println("Ha habido un error NullPointerException, inicializa desde configuración.");
+            mensaje = "Ha habido un error NullPointerException, inicializa desde configuración.";
+            System.out.println(mensaje);
             if (archivo.equals("default.txt")) {
-                System.out.println("Se ha producido un error al cargar la vivienda por defecto. Defina vivienda nueva en menú de configuración");
+                mensaje = "Se ha producido un error al cargar la vivienda por defecto. Defina vivienda nueva en menú de configuración";
+                System.out.println(mensaje);
             }
+            mensajeError(mensaje);
+            configuracion();
         }
     }
 
@@ -155,14 +164,15 @@ public class AspiraDaw {
             }
             System.out.println("Guardado completo.");
         } catch (IOException ioe) {
-            System.out.println("Ha habido un error en el guardado.");
+            mensaje = "Ha habido un fallo en el guardado.";
+            System.out.println(mensaje);
+            mensajeError(mensaje);
         }
     }
 
     public static String creaEstado() {
         String estado, lugar = "";
         char SIMBOLO = 9670;
-        char COMILLAS = 34;
 
         if (posicion == -1) {
             lugar = "la base de carga ";
@@ -220,5 +230,16 @@ public class AspiraDaw {
         estado = estado + "</td><tr/></table></html>";
 
         return estado;
+    }
+    
+    public static void mensajeError(String mensaje){
+        JOptionPane.showOptionDialog(
+                    null,
+                    mensaje,
+                    "ERROR",
+                    JOptionPane.DEFAULT_OPTION,
+                    JOptionPane.ERROR_MESSAGE,
+                    ALERT,
+                    new Object[]{"Ok"}, null);
     }
 }
