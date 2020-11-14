@@ -2,6 +2,7 @@ package programa;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import javax.swing.JOptionPane;
 import javax.swing.JLabel;
 import static programa.AspiraDaw.ALERT;
@@ -13,14 +14,30 @@ import static programa.AspiraDaw.ALERT;
 public class Test {
 
     public static void main(String[] args) {
-        String mensaje = "Este es un mensaje de error";
-        JOptionPane.showOptionDialog(
-                    null,
-                    mensaje,
-                    "ERROR",
-                    JOptionPane.DEFAULT_OPTION,
-                    JOptionPane.ERROR_MESSAGE,
-                    ALERT,
-                    new Object[]{"Ok"}, null);
+
+        LocalDateTime anterior = LocalDateTime.of(2020, 10, 13, 12, 0);
+        LocalDateTime ahora = LocalDateTime.now();
+
+        LocalDateTime tempDateTime = LocalDateTime.from(anterior);
+
+        long years = tempDateTime.until(ahora, ChronoUnit.YEARS);
+        tempDateTime = tempDateTime.plusYears(years);
+
+        long months = tempDateTime.until(ahora, ChronoUnit.MONTHS);
+        tempDateTime = tempDateTime.plusMonths(months);
+
+        long days = tempDateTime.until(ahora, ChronoUnit.DAYS);
+        tempDateTime = tempDateTime.plusDays(days);
+
+        long hours = tempDateTime.until(ahora, ChronoUnit.HOURS);
+        tempDateTime = tempDateTime.plusHours(hours);
+
+        long minutes = tempDateTime.until(ahora, ChronoUnit.MINUTES);
+
+        System.out.println(years + " years "
+                + months + " months "
+                + days + " days "
+                + hours + " hours "
+                + minutes + " minutes ");
     }
 }

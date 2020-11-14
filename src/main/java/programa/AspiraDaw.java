@@ -4,6 +4,7 @@ import javax.swing.ImageIcon;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.io.*;
+import java.time.temporal.ChronoUnit;
 import javax.swing.JOptionPane;
 import javax.swing.JLabel;
 import java.util.Arrays;
@@ -15,6 +16,9 @@ import java.util.Arrays;
 public class AspiraDaw {
 
     public static int bateria, cantidadEstancia, posicion;
+    public static long[] fechaRelativa = new long[5];
+    public static double modo;
+    public static final double MODO1 = 1.5, MODO2 = 2.25;
     public static boolean[] estadoEstancia;
     public static Estancia[] estancia;
     public static String mensaje;
@@ -30,8 +34,10 @@ public class AspiraDaw {
     public static void main(String[] args) {
 
         iniciaVivienda();
+
         estadoEstancia = new boolean[cantidadEstancia];
         Arrays.fill(estadoEstancia, false);
+
         switch (menuPrincipal()) {
             case 0:
                 modoLimpieza();
@@ -99,7 +105,6 @@ public class AspiraDaw {
 
     public static int menuPrincipal() {
         int opcion;
-
         opcion = JOptionPane.showOptionDialog(
                 null,
                 new JLabel(creaEstado()),
@@ -107,7 +112,7 @@ public class AspiraDaw {
                 JOptionPane.YES_NO_CANCEL_OPTION,
                 JOptionPane.QUESTION_MESSAGE,
                 ICONO,
-                new Object[]{"Modo Carga", "Modo LImpieza", "Configuración", "Salir"}, null);
+                new Object[]{"Modo Limpieza", "Modo Carga", "Configuración", "Salir"}, null);
         return opcion;
     }
 
@@ -141,11 +146,11 @@ public class AspiraDaw {
                     guardaVivienda();
                     break;
                 case 1:
-                    JOptionPane.showConfirmDialog(null, "Gracias por usar AspiraDaw!", "Hasta la próxima", JOptionPane.DEFAULT_OPTION);
                     repite = false;
                     break;
             }
         } while (repite);
+        JOptionPane.showConfirmDialog(null, "Gracias por usar AspiraDaw!", "Hasta la próxima", JOptionPane.DEFAULT_OPTION);
         return true;
     }
 
@@ -171,7 +176,7 @@ public class AspiraDaw {
     }
 
     public static String creaEstado() {
-        String estado, lugar = "";
+        String estado, lugar = "", cuantoTiempo = "";
         char SIMBOLO = 9670;
 
         if (posicion == -1) {
@@ -220,26 +225,72 @@ public class AspiraDaw {
         estado = estado + "</ul></td><td>";
 
         for (int i = 0; i < estadoEstancia.length; i++) {
-            if (estadoEstancia[i]){
-                estado = estado + " ---> <font color='green'>LIMPIO</font><br/>";
+            if (estadoEstancia[i]) {
+                estado = estado + " ---> <font color='green'><em>LIMPIO</em></font><br/>";
             } else {
-                estado = estado + " ---> <font color='green'>LIMPIO</font><br/>";
+                fechaRelativa = calculaTiempo(i);
+                if (fechaRelativa[0] == 1) {
+                    cuantoTiempo = fechaRelativa[0] + " año";
+                } else if (fechaRelativa[0] > 1) {
+                    cuantoTiempo = fechaRelativa[0] + " años";
+                } else if (fechaRelativa[1] == 1) {
+                    cuantoTiempo = fechaRelativa[1] + " mes";
+                } else if (fechaRelativa[1] > 1) {
+                    cuantoTiempo = fechaRelativa[1] + " meses";
+                } else if (fechaRelativa[2] == 1) {
+                    cuantoTiempo = fechaRelativa[2] + " dia";
+                } else if (fechaRelativa[2] > 1) {
+                    cuantoTiempo = fechaRelativa[2] + " dias";
+                } else if (fechaRelativa[3] == 1) {
+                    cuantoTiempo = fechaRelativa[3] + " hora";
+                } else if (fechaRelativa[3] > 1) {
+                    cuantoTiempo = fechaRelativa[3] + " horas";
+                } else if (fechaRelativa[4] == 1) {
+                    cuantoTiempo = fechaRelativa[4] + " minuto";
+                } else if (fechaRelativa[4] > 1) {
+                    cuantoTiempo = fechaRelativa[4] + " minutos";
+                }
+                estado = estado + "<font color='red'>" + cuantoTiempo + "</font><br/>";
             }
         }
-        
+
         estado = estado + "</td><tr/></table></html>";
 
         return estado;
     }
-    
-    public static void mensajeError(String mensaje){
+
+    public static void mensajeError(String mensaje) {
         JOptionPane.showOptionDialog(
-                    null,
-                    mensaje,
-                    "ERROR",
-                    JOptionPane.DEFAULT_OPTION,
-                    JOptionPane.ERROR_MESSAGE,
-                    ALERT,
-                    new Object[]{"Ok"}, null);
+                null,
+                mensaje,
+                "ERROR",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.ERROR_MESSAGE,
+                ALERT,
+                new Object[]{"Ok"}, null);
+    }
+
+    public static long[] calculaTiempo(int i) {
+        long[] tiempo = new long[5];
+        LocalDateTime ahora = LocalDateTime.now();
+        LocalDateTime anterior = estancia[i].fecha;
+
+        LocalDateTime tempDateTime = LocalDateTime.from(anterior);
+
+        tiempo[0] = tempDateTime.until(ahora, ChronoUnit.YEARS);
+        tempDateTime = tempDateTime.plusYears(tiempo[0]);
+
+        tiempo[1] = tempDateTime.until(ahora, ChronoUnit.MONTHS);
+        tempDateTime = tempDateTime.plusYears(tiempo[1]);
+
+        tiempo[2] = tempDateTime.until(ahora, ChronoUnit.DAYS);
+        tempDateTime = tempDateTime.plusYears(tiempo[2]);
+
+        tiempo[3] = tempDateTime.until(ahora, ChronoUnit.HOURS);
+        tempDateTime = tempDateTime.plusYears(tiempo[3]);
+
+        tiempo[4] = tempDateTime.until(ahora, ChronoUnit.MINUTES);
+
+        return tiempo;
     }
 }
