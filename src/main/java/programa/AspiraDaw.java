@@ -132,8 +132,8 @@ public class AspiraDaw {
         } else {
             icono = BAT90;
         }
-        mensaje = "<html><p align='center'>La batería se encuentra al <u>" + bateria + "%</u>,<br/>"
-                + "¿desea enviar a ApiraDaw al punto de carga?</p></html>";
+        mensaje = "<html><p align='center'>La batería se encuentra al <u>" + bateria + "%</u><br/>"
+                + "¿Desea enviar a ApiraDaw al punto de carga?</p></html>";
         int opcion = JOptionPane.showOptionDialog(
                 null,
                 new JLabel(mensaje),
@@ -169,8 +169,8 @@ public class AspiraDaw {
         do {
             opcion = JOptionPane.showOptionDialog(
                     null,
-                    "Indique qué desea hacer:",
-                    "Hasta la próxima",
+                    "Indique qué desea hacer",
+                    "Salir",
                     JOptionPane.YES_NO_CANCEL_OPTION,
                     JOptionPane.QUESTION_MESSAGE,
                     ICONO,
@@ -185,7 +185,14 @@ public class AspiraDaw {
                     break;
             }
         } while (repite);
-        JOptionPane.showConfirmDialog(null, "Gracias por usar AspiraDaw!", "Hasta la próxima", JOptionPane.DEFAULT_OPTION);
+         JOptionPane.showOptionDialog(
+                null,
+                "¡Gracias por usar AspiraDaw!",
+                "Hasta la próxima",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.DEFAULT_OPTION,
+                ICONO,
+                new Object[]{"Adios"}, null);;
         return true;
     }
 
