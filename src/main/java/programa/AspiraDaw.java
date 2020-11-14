@@ -17,11 +17,12 @@ public class AspiraDaw {
 
     public static int bateria, cantidadEstancia, posicion;
     public static long[] fechaRelativa = new long[5];
-    public static double modo;
     public static final double MODO1 = 1.5, MODO2 = 2.25;
+    public static double modo = MODO1;
     public static boolean[] estadoEstancia;
     public static Estancia[] estancia;
-    public static String mensaje;
+    public static final String MODOASPIRA = "aspiración", MODOFRIEGA = "fregado";
+    public static String mensaje, modoString = MODOASPIRA;
 
     public static final ImageIcon ICONO = new ImageIcon("src/main/resources/icon/icon_96x.jpg");
     public static final ImageIcon ALERT = new ImageIcon("src/main/resources/icon/alert_96x.jpg");
@@ -93,32 +94,74 @@ public class AspiraDaw {
 
     public static void menuPrincipal() {
         int opcion;
-        opcion = JOptionPane.showOptionDialog(
-                null,
-                new JLabel(creaEstado()),
-                "Menú Principal",
-                JOptionPane.YES_NO_CANCEL_OPTION,
-                JOptionPane.QUESTION_MESSAGE,
-                ICONO,
-                new Object[]{"Modo Limpieza", "Modo Carga", "Configuración", "Salir"}, null);
+        boolean repite = true;
+        do {
+            opcion = JOptionPane.showOptionDialog(
+                    null,
+                    new JLabel(creaEstado()),
+                    "Menú Principal",
+                    JOptionPane.YES_NO_CANCEL_OPTION,
+                    JOptionPane.QUESTION_MESSAGE,
+                    ICONO,
+                    new Object[]{"Modo Limpieza", "Modo Carga", "Configuración", "Salir"}, null);
 
-        switch (opcion) {
-            case 0:
-                modoLimpieza();
-                break;
-            case 1:
-                modoCarga();
-                break;
-            case 2:
-                configuracion();
-                break;
-            default:
-                menuSalir();
-        }
+            switch (opcion) {
+                case 0:
+                    modoLimpieza();
+                    break;
+                case 1:
+                    modoCarga();
+                    break;
+                case 2:
+                    configuracion();
+                    break;
+                default:
+                    repite = false;
+                    menuSalir();
+            }
+        } while (repite);
     }
 
     public static void modoLimpieza() {
+        int opcion;
+        boolean repite;
 
+        do {
+            mensaje = "AspiraDaw se encuentra en modo de " + modoString + ", seleccione opcion deseada:";
+
+            opcion = JOptionPane.showOptionDialog(
+                    null,
+                    new JLabel(mensaje),
+                    "Modo Limpieza",
+                    JOptionPane.YES_NO_CANCEL_OPTION,
+                    JOptionPane.QUESTION_MESSAGE,
+                    ICONO,
+                    new Object[]{"Modo Aspiración", "Modo Fregado", "Limpieza Completa", "Limpieza Personalizada"}, null);
+
+            switch (opcion) {
+                case 0:
+                    modoString = MODOASPIRA;
+                    modo = MODO1;
+                    repite = true;
+                    break;
+                case 1:
+                    modoString = MODOFRIEGA;
+                    modo = MODO2;
+                    repite = true;
+                    break;
+                case 2:
+                    limpiaTodo();
+                    repite = false;
+                    break;
+                case 3:
+                    limpiaAlgo();
+                    repite = false;
+                    break;
+                default:
+                    repite = false;
+            }
+
+        } while (repite);
     }
 
     public static void modoCarga() {
@@ -185,7 +228,7 @@ public class AspiraDaw {
                     break;
             }
         } while (repite);
-         JOptionPane.showOptionDialog(
+        JOptionPane.showOptionDialog(
                 null,
                 "¡Gracias por usar AspiraDaw!",
                 "Hasta la próxima",
@@ -269,7 +312,7 @@ public class AspiraDaw {
 
         for (int i = 0; i < estadoEstancia.length; i++) {
             if (estadoEstancia[i]) {
-                estado = estado + " ---> <font color='green'><em>LIMPIO</em></font><br/>";
+                estado = estado + "<font color='green'><em>LIMPIO</em></font><br/>";
             } else {
                 fechaRelativa = calculaTiempo(i);
                 if (fechaRelativa[0] == 1) {
