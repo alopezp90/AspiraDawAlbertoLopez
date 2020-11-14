@@ -38,19 +38,7 @@ public class AspiraDaw {
         estadoEstancia = new boolean[cantidadEstancia];
         Arrays.fill(estadoEstancia, false);
 
-        switch (menuPrincipal()) {
-            case 0:
-                modoLimpieza();
-                break;
-            case 1:
-                modoCarga();
-                break;
-            case 2:
-                configuracion();
-                break;
-            default:
-                menuSalir();
-        }
+        menuPrincipal();
     }
 
     public static void iniciaVivienda() {
@@ -103,7 +91,7 @@ public class AspiraDaw {
         }
     }
 
-    public static int menuPrincipal() {
+    public static void menuPrincipal() {
         int opcion;
         opcion = JOptionPane.showOptionDialog(
                 null,
@@ -113,7 +101,20 @@ public class AspiraDaw {
                 JOptionPane.QUESTION_MESSAGE,
                 ICONO,
                 new Object[]{"Modo Limpieza", "Modo Carga", "Configuración", "Salir"}, null);
-        return opcion;
+
+        switch (opcion) {
+            case 0:
+                modoLimpieza();
+                break;
+            case 1:
+                modoCarga();
+                break;
+            case 2:
+                configuracion();
+                break;
+            default:
+                menuSalir();
+        }
     }
 
     public static void modoLimpieza() {
@@ -121,7 +122,41 @@ public class AspiraDaw {
     }
 
     public static void modoCarga() {
-
+        ImageIcon icono;
+        if (bateria < 10) {
+            icono = BAT0;
+        } else if (bateria < 40) {
+            icono = BAT30;
+        } else if (bateria < 75) {
+            icono = BAT60;
+        } else {
+            icono = BAT90;
+        }
+        mensaje = "<html><p align='center'>La batería se encuentra al <u>" + bateria + "%</u>,<br/>"
+                + "¿desea enviar a ApiraDaw al punto de carga?</p></html>";
+        int opcion = JOptionPane.showOptionDialog(
+                null,
+                new JLabel(mensaje),
+                "Modo Carga",
+                JOptionPane.YES_NO_CANCEL_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                icono,
+                new Object[]{"Enviar", "Volver"}, null);
+        if (opcion == 0) {
+            bateria = 100;
+            posicion = -1;
+            mensaje = "<html><p align='center'>AspiraDaw se ha cargado por completo,<br/>"
+                    + "espera instrucciones en el punto de carga.</p></html>";
+            JOptionPane.showOptionDialog(
+                    null,
+                    new JLabel(mensaje),
+                    "Modo Carga",
+                    JOptionPane.YES_NO_CANCEL_OPTION,
+                    JOptionPane.QUESTION_MESSAGE,
+                    BAT90,
+                    new Object[]{"Ok"}, null);
+        }
+        menuPrincipal();
     }
 
     public static void configuracion() {
@@ -178,6 +213,7 @@ public class AspiraDaw {
     public static String creaEstado() {
         String estado, lugar = "", cuantoTiempo = "";
         char SIMBOLO = 9670;
+        char FLECHA = 10230;
 
         if (posicion == -1) {
             lugar = "la base de carga ";
@@ -250,7 +286,7 @@ public class AspiraDaw {
                 } else if (fechaRelativa[4] > 1) {
                     cuantoTiempo = fechaRelativa[4] + " minutos";
                 }
-                estado = estado + "<font color='red'>" + cuantoTiempo + "</font><br/>";
+                estado = estado + FLECHA + " <font color='red'>" + cuantoTiempo + "</font><br/>";
             }
         }
 
