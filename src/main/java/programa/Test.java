@@ -1,38 +1,34 @@
 package programa;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
-import javax.swing.JOptionPane;
-import javax.swing.JLabel;
-import static programa.AspiraDaw.ALERT;
-import java.util.Scanner;
-import java.util.Arrays;
-
 /**
  * @author Alberto López Puertas
  * <alopezp90@gmail.com>
  */
 public class Test {
 
+    public static double bateria = 13;
+
     public static void main(String[] args) {
-        
-        int n;
-        
-        String [] usuario;
-        Scanner sc = new Scanner(System.in);
-        System.out.println("Numero de usuarios");
-        n = sc.nextInt();
-        usuario = new String[n];
-        
-        Scanner scanner = new Scanner(System.in);
-        
-        for (int i=0; i<usuario.length;i++){
-            System.out.println("Introduce usuario "+(i+1));
-            usuario[i]=scanner.nextLine();
+
+        modoCarga();
+
+    }
+
+    public static void modoCarga() {
+
+        System.out.println("Cargando...Bateria al " + bateria + "%");
+
+        //Pasa el valor de bateria al siguiente multiplo entero de 5
+        bateria = Math.ceil(bateria);
+        while (bateria % 5 != 0) {
+            bateria++;
         }
-        
-        System.out.println(Arrays.toString(usuario));
-        System.out.println(usuario[2]);
+        int valorBase = (int) bateria;
+        //Imprime valores de 5 en 5 hasta 100%
+        for (int i = 0; i < (100 - valorBase) / 5; i++) {
+            System.out.println("Cargando...Bateria al " + bateria + "%");
+            bateria += 5;
+        }
+        System.out.println("Cargando...Bateria al " + bateria + "%");
     }
 }

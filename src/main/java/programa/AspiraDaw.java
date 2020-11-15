@@ -15,10 +15,11 @@ import java.util.Arrays;
  */
 public class AspiraDaw {
 
-    public static int bateria, cantidadEstancia, posicion;
+    public static int cantidadEstancia, posicion;
     public static long[] fechaRelativa = new long[5];
-    public static final double MODO1 = 1.5, MODO2 = 2.25;
-    public static double modo = MODO1;
+    public static long[][] estadoEstanciaTiempo;
+    public static final double MODO1 = 1.5, MODO2 = 2.25, BATMIN = 3;
+    public static double bateria, modo = MODO1;
     public static boolean[] estadoEstancia;
     public static Estancia[] estancia;
     public static final String MODOASPIRA = "aspiración", MODOFRIEGA = "fregado";
@@ -38,6 +39,7 @@ public class AspiraDaw {
 
         estadoEstancia = new boolean[cantidadEstancia];
         Arrays.fill(estadoEstancia, false);
+        estadoEstanciaTiempo = new long[cantidadEstancia][5]; //comprobar
 
         menuPrincipal();
     }
@@ -53,7 +55,7 @@ public class AspiraDaw {
             FileReader fileReader = new FileReader(ruta + archivo);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
 
-            bateria = Integer.parseInt(bufferedReader.readLine());
+            bateria = Double.parseDouble(bufferedReader.readLine());
 
             cantidadEstancia = Integer.parseInt(bufferedReader.readLine());
 
@@ -164,6 +166,43 @@ public class AspiraDaw {
         } while (repite);
     }
 
+    public static void limpiaTodo() {
+
+    }
+
+    public static void limpiaAlgo() {
+        Object [] opciones = new Object [cantidadEstancia];
+        for (int i = 0; i<cantidadEstancia;i++){
+            String tmp;
+            switch (estancia[i].tipo){
+                case 1:
+                    tmp = "Salón ";
+                    break;
+                case 2:
+                    tmp = "Cocina";
+                    break;
+                case 3:
+                    tmp = "Baño ";
+                    break;
+                default:
+                    tmp = "Dormitorio ";                  
+            }
+            opciones [i] = tmp + estancia[i].nombre;
+        }
+        Object opcion = JOptionPane.showInputDialog(
+                null,
+                "Seleccione estancia a limpiar",
+                "Limpieza Personalizada",
+                JOptionPane.QUESTION_MESSAGE,
+                ICONO,
+                opciones,
+                null);
+    }
+
+    public static boolean limpiable(int i) {
+        return estancia[i].superficie / modo < bateria - BATMIN;
+    }
+
     public static void modoCarga() {
         ImageIcon icono;
         if (bateria < 10) {
@@ -199,13 +238,13 @@ public class AspiraDaw {
                     BAT90,
                     new Object[]{"Ok"}, null);
         }
-        menuPrincipal();
     }
 
     public static void configuracion() {
 
     }
 
+    @SuppressWarnings("empty-statement")
     public static boolean menuSalir() {
         int opcion;
         boolean repite = true;
@@ -337,6 +376,7 @@ public class AspiraDaw {
                     cuantoTiempo = fechaRelativa[4] + " minutos";
                 }
                 estado = estado + FLECHA + " <font color='red'>" + cuantoTiempo + "</font><br/>";
+                estadoEstanciaTiempo[i] = fechaRelativa;
             }
         }
 
