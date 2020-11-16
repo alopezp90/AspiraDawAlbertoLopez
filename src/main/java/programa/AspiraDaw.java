@@ -15,16 +15,6 @@ import java.util.Arrays;
  */
 public class AspiraDaw {
 
-    public static int cantidadEstancia, posicion;
-    public static long[] fechaRelativa = new long[5];
-    public static long[][] estadoEstanciaTiempo;
-    public static final double MODO1 = 1.5, MODO2 = 2.25, BATMIN = 3;
-    public static double bateria, modo = MODO1;
-    public static boolean[] estadoEstancia;
-    public static Estancia[] estancia;
-    public static final String MODOASPIRA = "aspiración", MODOFRIEGA = "fregado";
-    public static String mensaje, modoString = MODOASPIRA;
-
     public static final ImageIcon ICONO = new ImageIcon("src/main/resources/icon/icon_96x.jpg");
     public static final ImageIcon ALERT = new ImageIcon("src/main/resources/icon/alert_96x.jpg");
     public static final ImageIcon CONFIG = new ImageIcon("src/main/resources/icon/settings_96x.jpg");
@@ -32,14 +22,27 @@ public class AspiraDaw {
     public static final ImageIcon BAT30 = new ImageIcon("src/main/resources/icon/battery30_96x.jpg");
     public static final ImageIcon BAT60 = new ImageIcon("src/main/resources/icon/battery60_96x.jpg");
     public static final ImageIcon BAT90 = new ImageIcon("src/main/resources/icon/battery90_96x.jpg");
+        
+    public static final double MODO1 = 1.5, MODO2 = 2.25, BATMIN = 3;
+    public static final String MODOASPIRA = "aspiración", MODOFRIEGA = "fregado";
+      
+    public static int cantidadEstancia, posicion;
+    public static long[] fechaRelativa = new long[5];
+    public static long[][] estadoEstanciaTiempo;  
+    public static double bateria, modo;
+    public static boolean[] estadoEstancia;
+    public static Estancia[] estancia;    
+    public static String mensaje, modoString;
 
     public static void main(String[] args) {
-
         iniciaVivienda();
 
         estadoEstancia = new boolean[cantidadEstancia];
         Arrays.fill(estadoEstancia, false);
-        estadoEstanciaTiempo = new long[cantidadEstancia][5]; //comprobar
+        estadoEstanciaTiempo = new long[cantidadEstancia][5];
+        
+        modoString = MODOASPIRA;
+        modo = MODO1;
 
         menuPrincipal();
     }
@@ -96,7 +99,7 @@ public class AspiraDaw {
 
     public static void menuPrincipal() {
         int opcion;
-        boolean repite = true;
+
         do {
             opcion = JOptionPane.showOptionDialog(
                     null,
@@ -118,15 +121,13 @@ public class AspiraDaw {
                     configuracion();
                     break;
                 default:
-                    repite = false;
                     menuSalir();
             }
-        } while (repite);
+        } while (opcion == 0 || opcion == 1 || opcion == 2);
     }
 
     public static void modoLimpieza() {
         int opcion;
-        boolean repite;
 
         do {
             mensaje = "AspiraDaw se encuentra en modo de " + modoString + ", seleccione opcion deseada:";
@@ -144,26 +145,19 @@ public class AspiraDaw {
                 case 0:
                     modoString = MODOASPIRA;
                     modo = MODO1;
-                    repite = true;
                     break;
                 case 1:
                     modoString = MODOFRIEGA;
                     modo = MODO2;
-                    repite = true;
                     break;
                 case 2:
                     limpiaTodo();
-                    repite = false;
                     break;
                 case 3:
                     limpiaAlgo();
-                    repite = false;
                     break;
-                default:
-                    repite = false;
-            }
-
-        } while (repite);
+             }
+        } while (opcion == 0 || opcion == 1);
     }
 
     public static void limpiaTodo() {
@@ -171,10 +165,10 @@ public class AspiraDaw {
     }
 
     public static void limpiaAlgo() {
-        Object [] opciones = new Object [cantidadEstancia];
-        for (int i = 0; i<cantidadEstancia;i++){
+        Object[] opciones = new Object[cantidadEstancia];
+        for (int i = 0; i < cantidadEstancia; i++) {
             String tmp;
-            switch (estancia[i].tipo){
+            switch (estancia[i].tipo) {
                 case 1:
                     tmp = "Salón ";
                     break;
@@ -185,9 +179,9 @@ public class AspiraDaw {
                     tmp = "Baño ";
                     break;
                 default:
-                    tmp = "Dormitorio ";                  
+                    tmp = "Dormitorio ";
             }
-            opciones [i] = tmp + estancia[i].nombre;
+            opciones[i] = tmp + estancia[i].nombre;
         }
         Object opcion = JOptionPane.showInputDialog(
                 null,
@@ -244,7 +238,6 @@ public class AspiraDaw {
 
     }
 
-    @SuppressWarnings("empty-statement")
     public static boolean menuSalir() {
         int opcion;
         boolean repite = true;
@@ -274,7 +267,7 @@ public class AspiraDaw {
                 JOptionPane.DEFAULT_OPTION,
                 JOptionPane.DEFAULT_OPTION,
                 ICONO,
-                new Object[]{"Adios"}, null);;
+                new Object[]{"Adios"}, null);
         return true;
     }
 
