@@ -71,7 +71,11 @@ public class AspiraDaw {
                 tmpNombre = bufferedReader.readLine();
                 tmpSuperficie = Integer.parseInt(bufferedReader.readLine());
                 tmpFecha = LocalDateTime.parse(bufferedReader.readLine());
-                estancia[i] = new Estancia(tmpTipo, tmpNombre, tmpSuperficie, tmpFecha);
+                estancia[i] = new Estancia();
+                estancia[i].setTipo(tmpTipo);
+                estancia[i].setNombre(tmpNombre);
+                estancia[i].setSuperficie(tmpSuperficie);
+                estancia[i].setFecha(tmpFecha);
             }
             System.out.println("Carga de " + archivo + " realizada con éxito.");
 
@@ -168,7 +172,7 @@ public class AspiraDaw {
         Object[] opciones = new Object[cantidadEstancia];
         for (int i = 0; i < cantidadEstancia; i++) {
             String tmp;
-            switch (estancia[i].tipo) {
+            switch (estancia[i].getTipo()) {
                 case 1:
                     tmp = "Salón ";
                     break;
@@ -181,7 +185,7 @@ public class AspiraDaw {
                 default:
                     tmp = "Dormitorio ";
             }
-            opciones[i] = tmp + estancia[i].nombre;
+            opciones[i] = tmp + estancia[i].getNombre();
         }
         Object opcion = JOptionPane.showInputDialog(
                 null,
@@ -194,7 +198,7 @@ public class AspiraDaw {
     }
 
     public static boolean limpiable(int i) {
-        return estancia[i].superficie / modo < bateria - BATMIN;
+        return estancia[i].getSuperficie() / modo < bateria - BATMIN;
     }
 
     public static void modoCarga() {
@@ -279,10 +283,10 @@ public class AspiraDaw {
             printWriter.println(cantidadEstancia);
             printWriter.println(posicion);
             for (int i = 0; i < cantidadEstancia; i++) {
-                printWriter.println(estancia[i].tipo);
-                printWriter.println(estancia[i].nombre);
-                printWriter.println(estancia[i].superficie);
-                printWriter.println(estancia[i].fecha);
+                printWriter.println(estancia[i].getTipo());
+                printWriter.println(estancia[i].getNombre());
+                printWriter.println(estancia[i].getSuperficie());
+                printWriter.println(estancia[i].getFecha());
             }
             System.out.println("Guardado completo.");
         } catch (IOException ioe) {
@@ -300,18 +304,18 @@ public class AspiraDaw {
         if (posicion == -1) {
             lugar = "la base de carga ";
         } else {
-            switch (estancia[posicion].tipo) {
+            switch (estancia[posicion].getTipo()) {
                 case 1:
-                    lugar = "el salón " + estancia[posicion].nombre;
+                    lugar = "el salón " + estancia[posicion].getNombre();
                     break;
                 case 2:
-                    lugar = "la cocina " + estancia[posicion].nombre;
+                    lugar = "la cocina " + estancia[posicion].getNombre();
                     break;
                 case 3:
-                    lugar = "el baño " + estancia[posicion].nombre;
+                    lugar = "el baño " + estancia[posicion].getNombre();
                     break;
                 case 4:
-                    lugar = "el dormitorio " + estancia[posicion].nombre;
+                    lugar = "el dormitorio " + estancia[posicion].getNombre();
             }
         }
 
@@ -324,7 +328,7 @@ public class AspiraDaw {
                 + SIMBOLO + " Estado de la vivienda:<br/><table><tr><td><ul>";
 
         for (int i = 0; i < estancia.length; i++) {
-            switch (estancia[i].tipo) {
+            switch (estancia[i].getTipo()) {
                 case 1:
                     lugar = " Salón ";
                     break;
@@ -337,7 +341,7 @@ public class AspiraDaw {
                 case 4:
                     lugar = " Dormitorio ";
             }
-            estado = estado + "<li>" + lugar + "<em>" + estancia[i].nombre + "</em></li>";
+            estado = estado + "<li>" + lugar + "<em>" + estancia[i].getNombre() + "</em></li>";
         }
 
         estado = estado + "</ul></td><td>";
@@ -392,7 +396,7 @@ public class AspiraDaw {
     public static long[] calculaTiempo(int i) {
         long[] tiempo = new long[5];
         LocalDateTime ahora = LocalDateTime.now();
-        LocalDateTime anterior = estancia[i].fecha;
+        LocalDateTime anterior = estancia[i].getFecha();
 
         LocalDateTime tempDateTime = LocalDateTime.from(anterior);
 
