@@ -1,5 +1,6 @@
 package programa;
 
+import java.awt.HeadlessException;
 import javax.swing.ImageIcon;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -26,16 +27,16 @@ public class AspiraDaw {
     public static final double MODO1 = 1.5, MODO2 = 2.25, BATMIN = 3;
     public static final String MODOASPIRA = "aspiración", MODOFRIEGA = "fregado";
 
-    public static int cantidadEstancia, posicion;
+    public static int cantidadEstancia, posicion = -1;
     public static long[] fechaRelativa = new long[5];
     public static long[][] estadoEstanciaTiempo;
-    public static double bateria, modo;
+    public static double bateria = 0, modo;
     public static boolean[] estadoEstancia;
     public static Estancia[] estancia;
     public static String mensaje, modoString;
 
     public static void main(String[] args) {
-        iniciaVivienda();
+        iniciaVivienda("save.txt");
 
         estadoEstancia = new boolean[cantidadEstancia];
         Arrays.fill(estadoEstancia, false);
@@ -47,9 +48,8 @@ public class AspiraDaw {
         menuPrincipal();
     }
 
-    public static void iniciaVivienda() {
+    public static void iniciaVivienda(String archivo) {
         String ruta = "src/main/resources/saves/";
-        String archivo = "save.txt";
 
         try {
             FileReader fileReader = new FileReader(ruta + archivo);
@@ -76,7 +76,7 @@ public class AspiraDaw {
             mensaje = "Ha habido un error en la carga, inicializa desde configuración.";
             System.out.println(mensaje);
             if (archivo.equals("default.txt")) {
-                mensaje = "Se ha producido un error al cargar la vivienda por defecto. Defina vivienda nueva en menú de configuración";
+                mensaje = "Se ha producido un error al cargar la vivienda por defecto. Crea vivienda nueva en menú de configuración";
                 System.out.println(mensaje);
             }
             mensajeError(mensaje);
@@ -86,7 +86,7 @@ public class AspiraDaw {
             mensaje = "Ha habido un error NullPointerException, inicializa desde configuración.";
             System.out.println(mensaje);
             if (archivo.equals("default.txt")) {
-                mensaje = "Se ha producido un error al cargar la vivienda por defecto. Defina vivienda nueva en menú de configuración";
+                mensaje = "Se ha producido un error al cargar la vivienda por defecto. Crea vivienda nueva en menú de configuración";
                 System.out.println(mensaje);
             }
             mensajeError(mensaje);
@@ -127,7 +127,7 @@ public class AspiraDaw {
         int opcion;
 
         do {
-            mensaje = "AspiraDaw se encuentra en modo de <u>" + modoString + "</u>, seleccione opcion deseada:";
+            mensaje = "<html>AspiraDaw se encuentra en modo de <u>" + modoString + "</u>, seleccione opcion deseada:</html>";
 
             opcion = JOptionPane.showOptionDialog(
                     null,
@@ -166,6 +166,7 @@ public class AspiraDaw {
                 if (limpiable(i)) {
                     bateria -= estancia[i].getSuperficie() / modo;
                     estadoEstancia[i] = true;
+                    estancia[i].setFecha(LocalDateTime.now());
                     limpia++;
                     String tmp;
                     switch (estancia[i].getTipo()) {
@@ -182,6 +183,8 @@ public class AspiraDaw {
                             tmp = "Dormitorio ";
                     }
                     informa = informa + "<li>" + tmp + estancia[i].getNombre() + "</li>";
+                } else {
+                    break;
                 }
             }
         }
@@ -194,7 +197,7 @@ public class AspiraDaw {
                     break;
                 }
             }
-            if (completo){
+            if (completo) {
                 mensajeError("Todas las estancias están LIMPIAS. Si desea volver a limpiarlas reinicie \n"
                         + "el estado desde el menú de configuración o reinicie AspiraDaw.");
             } else {
@@ -251,6 +254,7 @@ public class AspiraDaw {
         if (limpiable(posicion)) {
             bateria -= estancia[posicion].getSuperficie() / modo;
             estadoEstancia[posicion] = true;
+            estancia[posicion].setFecha(LocalDateTime.now());
             JOptionPane.showOptionDialog(
                     null,
                     "Se ha limpiado con éxito " + opcionElegida,
@@ -281,7 +285,7 @@ public class AspiraDaw {
         } else {
             icono = BAT90;
         }
-        mensaje = "<html><p align='center'>La batería se encuentra al <u>" + bateria + "%</u><br/>"
+        mensaje = "<html><p align='center'>La batería se encuentra al <u>" + (int) bateria + "%</u><br/>"
                 + "¿Desea enviar a ApiraDaw al punto de carga?</p></html>";
         int opcion = JOptionPane.showOptionDialog(
                 null,
@@ -308,7 +312,118 @@ public class AspiraDaw {
     }
 
     public static void configuracion() {
+        int opcion;
+        boolean repite = true;
+        do {
+            opcion = JOptionPane.showOptionDialog(
+                    null,
+                    "Indique qué desea hacer:",
+                    "Menú Configuración",
+                    JOptionPane.YES_NO_CANCEL_OPTION,
+                    JOptionPane.QUESTION_MESSAGE,
+                    CONFIG,
+                    new Object[]{"Crea vivienda", "Carga vivienda por defecto", "Nivel de batería", "Reiniciar estado", "Menú Principal"}, null);
+            switch (opcion) {
+                case 0:
+                    creaVivienda();
+                    break;
+                case 1:
+                    iniciaVivienda("default.txt");
+                    break;
+                case 2:
+                    do {
+                        Object objeto = JOptionPane.showInputDialog(null,
+                                "Indique nivel de batería deseado",
+                                "Nivel de batería",
+                                JOptionPane.OK_OPTION,
+                                CONFIG,
+                                null,
+                                null);
+                        String texto = objeto.toString();
+                        bateria = Double.parseDouble(texto);
+                        if (bateria < 3 || bateria > 100) {
+                            mensajeError("Introduzca un valor de batería de entre 3 y 100.");
+                        }
+                    } while (bateria >= 3 && bateria <= 100);
+                    break;
+                case 3:
+                    Arrays.fill(estadoEstancia, false);
+                default:
+                    repite = false;
+            }
+        } while (repite);
+    }
 
+    public static void creaVivienda() {
+        do {
+            Object objeto = JOptionPane.showInputDialog(null,
+                    "Indique número de estancias en la vivienda",
+                    "Crea vivienda",
+                    JOptionPane.OK_OPTION,
+                    CONFIG,
+                    null,
+                    null);
+            String texto = objeto.toString();
+            cantidadEstancia = Integer.parseInt(texto);
+            if (cantidadEstancia < 1) {
+                mensajeError("Introduzca una cantidad mayor que cero.");
+            }
+        } while (cantidadEstancia < 1);
+
+        estancia = new Estancia[cantidadEstancia];
+        for (int i = 0; i < cantidadEstancia; i++) {
+            estancia[i] = new Estancia();
+            int opcion;
+            do {
+                opcion = JOptionPane.showOptionDialog(
+                        null,
+                        "Seleccione tipo de estancia",
+                        "Crea estancia " + i,
+                        JOptionPane.YES_NO_CANCEL_OPTION,
+                        JOptionPane.QUESTION_MESSAGE,
+                        CONFIG,
+                        new Object[]{"Salón", "Cocina", "Baño", "Dormitorio"}, null);
+            } while (opcion < 0 || opcion > 3);
+            estancia[i].setTipo(opcion + 1);
+
+            Object objeto = JOptionPane.showInputDialog(null,
+                    "Indique un nombre para la estancia (opcional)",
+                    "Crea estancia " + i,
+                    JOptionPane.OK_OPTION,
+                    CONFIG,
+                    null,
+                    null);
+            estancia[i].setNombre(objeto.toString().replaceAll(" ", ""));
+
+            boolean repite = false;
+            do {
+                objeto = JOptionPane.showInputDialog(null,
+                        "Indique el tamaño (m2) de la estancia " + i,
+                        "Crea estancia " + i,
+                        JOptionPane.OK_OPTION,
+                        CONFIG,
+                        null,
+                        null);
+                String texto = objeto.toString();
+                if (isParsable(texto)) {
+                    estancia[i].setSuperficie(Integer.parseInt(texto));
+                } else {
+                    mensaje = "No se ha podido fijar la superficie de la estancia " + i;
+                    repite = true;
+                    System.out.println(mensaje);
+                    mensajeError(mensaje);
+                }
+            } while (repite);
+        }
+    }
+
+    public static boolean isParsable(String texto) {
+        try {
+            Integer.parseInt(texto);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 
     public static boolean menuSalir() {
@@ -393,7 +508,7 @@ public class AspiraDaw {
         String fechaString = fecha.format(formatter);
 
         estado = "<html>" + SIMBOLO + " Son las " + fechaString + "<br/>"
-                + SIMBOLO + " AspiraDaw se encuentra en <u>" + lugar + "</u> con un " + (int)bateria + "% de batería.<br/><br/>"
+                + SIMBOLO + " AspiraDaw se encuentra en <u>" + lugar + "</u> con un " + (int) bateria + "% de batería.<br/><br/>"
                 + SIMBOLO + " Estado de la vivienda:<br/><table><tr><td><ul>";
 
         for (int i = 0; i < estancia.length; i++) {
