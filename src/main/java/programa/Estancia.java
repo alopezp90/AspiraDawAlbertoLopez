@@ -18,7 +18,7 @@ public class Estancia {
         this.superficie = superficie;
         this.fecha = fecha;
     }
-    
+
     public Estancia() {
         this.tipo = 0;
         this.nombre = "";
@@ -31,7 +31,11 @@ public class Estancia {
     }
 
     public void setTipo(int tipo) {
-        this.tipo = tipo;
+        if (tipo == 1 || tipo == 2 || tipo == 3 || tipo == 4) {
+            this.tipo = tipo;
+        } else {
+            this.tipo = 1;
+        }
     }
 
     public int getSuperficie() {
@@ -39,7 +43,13 @@ public class Estancia {
     }
 
     public void setSuperficie(int superficie) {
-        this.superficie = superficie;
+        if (superficie <= 100 && superficie >= 0) {
+            this.superficie = superficie;
+        } else if (superficie < 0) {
+            this.superficie = 0;
+        } else {
+            this.superficie = 100;
+        }
     }
 
     public String getNombre() {
@@ -47,7 +57,7 @@ public class Estancia {
     }
 
     public void setNombre(String nombre) {
-        this.nombre = nombre;
+        this.nombre = nombre.replaceAll(" ", "");
     }
 
     public LocalDateTime getFecha() {

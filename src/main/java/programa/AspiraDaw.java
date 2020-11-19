@@ -22,16 +22,16 @@ public class AspiraDaw {
     public static final ImageIcon BAT30 = new ImageIcon("src/main/resources/icon/battery30_96x.jpg");
     public static final ImageIcon BAT60 = new ImageIcon("src/main/resources/icon/battery60_96x.jpg");
     public static final ImageIcon BAT90 = new ImageIcon("src/main/resources/icon/battery90_96x.jpg");
-        
+
     public static final double MODO1 = 1.5, MODO2 = 2.25, BATMIN = 3;
     public static final String MODOASPIRA = "aspiración", MODOFRIEGA = "fregado";
-      
+
     public static int cantidadEstancia, posicion;
     public static long[] fechaRelativa = new long[5];
-    public static long[][] estadoEstanciaTiempo;  
+    public static long[][] estadoEstanciaTiempo;
     public static double bateria, modo;
     public static boolean[] estadoEstancia;
-    public static Estancia[] estancia;    
+    public static Estancia[] estancia;
     public static String mensaje, modoString;
 
     public static void main(String[] args) {
@@ -40,7 +40,7 @@ public class AspiraDaw {
         estadoEstancia = new boolean[cantidadEstancia];
         Arrays.fill(estadoEstancia, false);
         estadoEstanciaTiempo = new long[cantidadEstancia][5];
-        
+
         modoString = MODOASPIRA;
         modo = MODO1;
 
@@ -127,7 +127,7 @@ public class AspiraDaw {
         int opcion;
 
         do {
-            mensaje = "AspiraDaw se encuentra en modo de " + modoString + ", seleccione opcion deseada:";
+            mensaje = "AspiraDaw se encuentra en modo de <u>" + modoString + "</u>, seleccione opcion deseada:";
 
             opcion = JOptionPane.showOptionDialog(
                     null,
@@ -153,11 +153,63 @@ public class AspiraDaw {
                 case 3:
                     limpiaAlgo();
                     break;
-             }
+            }
         } while (opcion == 0 || opcion == 1);
     }
 
     public static void limpiaTodo() {
+        int limpia = 0;
+        String informa = "<html>Durante la ejecución se ha limpiado:<ul>";
+        for (int i = 0; i < cantidadEstancia; i++) {
+            if (!estadoEstancia[i]) {
+                posicion = i;
+                if (limpiable(i)) {
+                    bateria -= estancia[i].getSuperficie() / modo;
+                    estadoEstancia[i] = true;
+                    limpia++;
+                    String tmp;
+                    switch (estancia[i].getTipo()) {
+                        case 1:
+                            tmp = "Salón ";
+                            break;
+                        case 2:
+                            tmp = "Cocina";
+                            break;
+                        case 3:
+                            tmp = "Baño ";
+                            break;
+                        default:
+                            tmp = "Dormitorio ";
+                    }
+                    informa = informa + "<li>" + tmp + estancia[i].getNombre() + "</li>";
+                }
+            }
+        }
+        informa = informa + "</ul></html>";
+        boolean completo = true;
+        if (limpia == 0) {
+            for (int i = 0; i < cantidadEstancia; i++) {
+                if (!estadoEstancia[i]) {
+                    completo = false;
+                    break;
+                }
+            }
+            if (completo){
+                mensajeError("Todas las estancias están LIMPIAS. Si desea volver a limpiarlas reinicie \n"
+                        + "el estado desde el menú de configuración o reinicie AspiraDaw.");
+            } else {
+                mensajeError("La batería no ha permitido limpiar ninguna estancia.");
+            }
+        } else {
+            JOptionPane.showOptionDialog(
+                    null,
+                    new JLabel(informa),
+                    "Limpieza Completa",
+                    JOptionPane.DEFAULT_OPTION,
+                    JOptionPane.DEFAULT_OPTION,
+                    ICONO,
+                    new Object[]{"Ok"}, null);
+        }
 
     }
 
@@ -180,7 +232,7 @@ public class AspiraDaw {
             }
             opciones[i] = tmp + estancia[i].getNombre();
         }
-        Object opcion = JOptionPane.showInputDialog(
+        Object opcionElegida = JOptionPane.showInputDialog(
                 null,
                 "Seleccione estancia a limpiar",
                 "Limpieza Personalizada",
@@ -188,6 +240,30 @@ public class AspiraDaw {
                 ICONO,
                 opciones,
                 null);
+
+        for (int i = 0; i < cantidadEstancia; i++) {
+            if (opciones[i] == opcionElegida) {
+                posicion = i;
+                break;
+            }
+        }
+
+        if (limpiable(posicion)) {
+            bateria -= estancia[posicion].getSuperficie() / modo;
+            estadoEstancia[posicion] = true;
+            JOptionPane.showOptionDialog(
+                    null,
+                    "Se ha limpiado con éxito " + opcionElegida,
+                    "Limpieza Personalizada",
+                    JOptionPane.DEFAULT_OPTION,
+                    JOptionPane.DEFAULT_OPTION,
+                    ICONO,
+                    new Object[]{"Ok"}, null);
+        } else if (97 >= estancia[posicion].getSuperficie() / modo) {
+            mensajeError("No ha suficiente batería para limpiar " + opcionElegida + ",\nsi desea hacerlo, cargue Aspiradaw.");
+        } else {
+            mensajeError("No es posible limpiar " + opcionElegida + " en éste modo,\n estancia demasiado grande.");
+        }
     }
 
     public static boolean limpiable(int i) {
@@ -317,7 +393,7 @@ public class AspiraDaw {
         String fechaString = fecha.format(formatter);
 
         estado = "<html>" + SIMBOLO + " Son las " + fechaString + "<br/>"
-                + SIMBOLO + " AspiraDaw se encuentra en " + lugar + " con un " + bateria + "% de batería.<br/><br/>"
+                + SIMBOLO + " AspiraDaw se encuentra en <u>" + lugar + "</u> con un " + (int)bateria + "% de batería.<br/><br/>"
                 + SIMBOLO + " Estado de la vivienda:<br/><table><tr><td><ul>";
 
         for (int i = 0; i < estancia.length; i++) {
