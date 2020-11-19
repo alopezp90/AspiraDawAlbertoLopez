@@ -48,9 +48,6 @@ public class AspiraDaw {
     }
 
     public static void iniciaVivienda() {
-        int tmpTipo, tmpSuperficie;
-        String tmpNombre;
-        LocalDateTime tmpFecha;
         String ruta = "src/main/resources/saves/";
         String archivo = "save.txt";
 
@@ -67,15 +64,11 @@ public class AspiraDaw {
             estancia = new Estancia[cantidadEstancia];
 
             for (int i = 0; i < cantidadEstancia; i++) {
-                tmpTipo = Integer.parseInt(bufferedReader.readLine());
-                tmpNombre = bufferedReader.readLine();
-                tmpSuperficie = Integer.parseInt(bufferedReader.readLine());
-                tmpFecha = LocalDateTime.parse(bufferedReader.readLine());
                 estancia[i] = new Estancia();
-                estancia[i].setTipo(tmpTipo);
-                estancia[i].setNombre(tmpNombre);
-                estancia[i].setSuperficie(tmpSuperficie);
-                estancia[i].setFecha(tmpFecha);
+                estancia[i].setTipo(Integer.parseInt(bufferedReader.readLine()));
+                estancia[i].setNombre(bufferedReader.readLine());
+                estancia[i].setSuperficie(Integer.parseInt(bufferedReader.readLine()));
+                estancia[i].setFecha(LocalDateTime.parse(bufferedReader.readLine()));
             }
             System.out.println("Carga de " + archivo + " realizada con éxito.");
 
