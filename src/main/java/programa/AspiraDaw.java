@@ -1,6 +1,5 @@
 package programa;
 
-import java.awt.HeadlessException;
 import javax.swing.ImageIcon;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -9,6 +8,8 @@ import java.time.temporal.ChronoUnit;
 import javax.swing.JOptionPane;
 import javax.swing.JLabel;
 import java.util.Arrays;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 
 /**
  * @author Alberto López Puertas
@@ -26,6 +27,7 @@ public class AspiraDaw {
 
     public static final double MODO1 = 1.5, MODO2 = 2.25, BATMIN = 3;
     public static final String MODOASPIRA = "aspiración", MODOFRIEGA = "fregado";
+    public static final String USER = "Alberto", PASS = "1234";
 
     public static int cantidadEstancia, posicion = -1;
     public static long[] fechaRelativa = new long[5];
@@ -36,16 +38,55 @@ public class AspiraDaw {
     public static String mensaje, modoString;
 
     public static void main(String[] args) {
-        iniciaVivienda("save.txt");
+        if (compruebaCredenciales()) {
+            iniciaVivienda("save.txt");
 
-        estadoEstancia = new boolean[cantidadEstancia];
-        Arrays.fill(estadoEstancia, false);
-        estadoEstanciaTiempo = new long[cantidadEstancia][5];
+            estadoEstancia = new boolean[cantidadEstancia];
+            Arrays.fill(estadoEstancia, false);
+            estadoEstanciaTiempo = new long[cantidadEstancia][5];
 
-        modoString = MODOASPIRA;
-        modo = MODO1;
+            modoString = MODOASPIRA;
+            modo = MODO1;
 
-        menuPrincipal();
+            menuPrincipal();
+        } else {
+            mensaje = "El usuario o la contraseña no son válidos.";
+            mensajeError(mensaje);
+        }
+    }
+
+    public static boolean compruebaCredenciales() {
+        int opcion;
+        try {
+            Object objeto = JOptionPane.showInputDialog(null,
+                    "Introduzca nombre de usuario:",
+                    "Bienvenido a AspiraDaw",
+                    JOptionPane.OK_OPTION,
+                    ICONO,
+                    null,
+                    null);
+            String texto = objeto.toString();
+            if (texto.equalsIgnoreCase(USER)) {
+                JPanel panel = new JPanel();
+                JLabel label = new JLabel("Introduzca contraseña");
+                JPasswordField pass = new JPasswordField(8);
+                panel.add(label);
+                panel.add(pass);
+                String[] options = new String[]{"OK", "Cancelar"};
+                opcion = JOptionPane.showOptionDialog(null, panel, "Bienvenido a AspiraDAW",
+                        JOptionPane.NO_OPTION, JOptionPane.PLAIN_MESSAGE,
+                        ICONO, options, options[0]);
+                if (opcion == 0) {
+                    char[] password = pass.getPassword();
+                    if (new String(password).equals(PASS)) {
+                        return true;
+                    }
+                }
+            }
+        } catch (NullPointerException e) {
+            System.out.println("Ha habido una NullPointerException");
+        }
+        return false;
     }
 
     public static void iniciaVivienda(String archivo) {
@@ -530,7 +571,12 @@ public class AspiraDaw {
 
         estado = estado + "</ul></td><td>";
 
-        for (int i = 0; i < estadoEstancia.length; i++) {
+        for (int i = 0; i < cantidadEstancia; i++) {
+            estado = estado + estancia[i].getSuperficie() + " m<sup>2</sup><br/>";
+        }
+        estado = estado + "</td><td>";
+
+        for (int i = 0; i < cantidadEstancia; i++) {
             if (estadoEstancia[i]) {
                 estado = estado + "<font color='green'><em>LIMPIO</em></font><br/>";
             } else {
