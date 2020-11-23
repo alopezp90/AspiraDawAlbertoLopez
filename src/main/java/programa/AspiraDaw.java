@@ -16,7 +16,8 @@ import javax.swing.JPasswordField;
  * <alopezp90@gmail.com>
  */
 public class AspiraDaw {
-
+    
+    //Declaracion de constantes de imagen para los iconos de los JOptionPane
     public static final ImageIcon ICONO = new ImageIcon("src/main/resources/icon/icon_96x.jpg");
     public static final ImageIcon ALERT = new ImageIcon("src/main/resources/icon/alert_96x.jpg");
     public static final ImageIcon CONFIG = new ImageIcon("src/main/resources/icon/settings_96x.jpg");
@@ -24,19 +25,23 @@ public class AspiraDaw {
     public static final ImageIcon BAT30 = new ImageIcon("src/main/resources/icon/battery30_96x.jpg");
     public static final ImageIcon BAT60 = new ImageIcon("src/main/resources/icon/battery60_96x.jpg");
     public static final ImageIcon BAT90 = new ImageIcon("src/main/resources/icon/battery90_96x.jpg");
-
+    
+    //Declaracion de constantes usadas en el programa
     public static final double MODO1 = 1.5, MODO2 = 2.25, BATMIN = 3;
     public static final String MODOASPIRA = "aspiración", MODOFRIEGA = "fregado";
     public static final String USER = "Alberto", PASS = "1234";
+    
+    //Declaracion de variables
+    public static int cantidadEstancia, posicion = -1;      //posicion tiene valor -1 para la base de carga, el resto de valores se corresponden con estancia[i]
+    public static long[] fechaRelativa = new long[5];       //usado para almacenar cúanto hace que no se limpia una estancia
+    public static long[][] estadoEstanciaTiempo;            //usado para almacenar fechaRelativa de todas las estancias
+    public static double bateria = 0, modo;                 
+    public static boolean[] estadoEstancia;                 //almacena qué estancias se han limpiado durante ésta ejecución del programa
+    public static Estancia[] estancia;                      //almacena las estancias generadas por el constructor Estancia()
+    public static String mensaje, modoString;               //mensaje se usa de forma general para pasar textos a JOptionPane
+                                                            //modoString almacena el nombre del modo actual de limpieza
 
-    public static int cantidadEstancia, posicion = -1;
-    public static long[] fechaRelativa = new long[5];
-    public static long[][] estadoEstanciaTiempo;
-    public static double bateria = 0, modo;
-    public static boolean[] estadoEstancia;
-    public static Estancia[] estancia;
-    public static String mensaje, modoString;
-
+    //Metodo principal del programa, comprueba las credenciales, inicializa los arrays de estado, el modo de limpieza y lanza el menú principal.
     public static void main(String[] args) {
         if (compruebaCredenciales()) {
             iniciaVivienda("save.txt");
@@ -54,7 +59,11 @@ public class AspiraDaw {
             mensajeError(mensaje);
         }
     }
-
+    
+    //Este método comprueba primero que el usuario es el correcto (permite uso de mayusculas y minusculas)
+    //y en caso de serlo, solicita la contraseña (1234), si ésta es correcta, devuelve true para que
+    //pueda continuar la ejecución del programa. En caso de que sea incorrecta, manda un mensaje de error
+    //y termina la ejecución del programa.
     public static boolean compruebaCredenciales() {
         int opcion;
         try {
@@ -89,6 +98,8 @@ public class AspiraDaw {
         return false;
     }
 
+    //Inicializa estancia[i] a partir de los datos almacenados en save.txt
+    //informa mediante mensaje de error y tambien por consola de fallos en el proceso
     public static void iniciaVivienda(String archivo) {
         String ruta = "src/main/resources/saves/";
 
@@ -135,9 +146,10 @@ public class AspiraDaw {
         }
     }
 
+    //Selector principal de AspiraDaw. Informa del estado general de la aspiradora y la vivienda
+    //y permite navegar por los demás menús
     public static void menuPrincipal() {
         int opcion;
-
         do {
             opcion = JOptionPane.showOptionDialog(
                     null,
@@ -164,9 +176,10 @@ public class AspiraDaw {
         } while (opcion == 0 || opcion == 1 || opcion == 2);
     }
 
+    //Selector del modo limpieza, informa del modo actual, permitiendo cambiarlo con un boton
+    //da a elegir entre limpiar toda la vivienda o solo una habitacion seleccionada
     public static void modoLimpieza() {
         int opcion;
-
         do {
             mensaje = "<html>AspiraDaw se encuentra en modo de <u>" + modoString + "</u>, seleccione opcion deseada:</html>";
 
@@ -197,7 +210,14 @@ public class AspiraDaw {
             }
         } while (opcion == 0 || opcion == 1);
     }
-
+    
+    //Realiza la limpieza de todas las habitaciones no limpias de la vivienda. El proceso es:
+    //- Comprueba que la estancia no se haya limpiado durante ésta ejecucion
+    //- Si no esta marcada como limpia cambia la posicion de la aspiradora ahí
+    //- Comprueba que la bateria sea suficiente, si lo es limpia y pasa a la siguiente estancia, si no lo es, termina la limpieza
+    //Al terminar, informa de qué estancias se han limpiado antes de volver al menú principal
+    //Si ninguna habitacion ha sido limpiada, informa de si ha sido porque ya estaban todas marcadas como "LIMPIA" 
+    //o porque la bateria no lo ha permitido en cada caso, recomienda qué hacer para solucionarlo
     public static void limpiaTodo() {
         int limpia = 0;
         String informa = "<html>Durante la ejecución se ha limpiado:<ul>";
@@ -257,6 +277,11 @@ public class AspiraDaw {
 
     }
 
+    //Modo de limpieza habitacion por habitación. Da al usuario un listado de todas las estancias
+    //cambia la posicion de AspiraDaw a la seleccionada y hace el cálculo de bateria.
+    //Antes de volver al menú principal informa de si la limpieza se ha realizado con éxito o no.
+    //Si no se ha podido limpiar informa de si hay que cargar más la bateria, 
+    //o si la estancia es demasiado grande para cualquier carga.
     public static void limpiaAlgo() {
         Object[] opciones = new Object[cantidadEstancia];
         for (int i = 0; i < cantidadEstancia; i++) {
@@ -310,11 +335,15 @@ public class AspiraDaw {
             mensajeError("No es posible limpiar " + opcionElegida + " en éste modo,\n estancia demasiado grande.");
         }
     }
-
+    
+    //Devuelve true si es posible limpiar la estancia actual con la bateria y el modo seleccionados
     public static boolean limpiable(int i) {
         return estancia[i].getSuperficie() / modo < bateria - BATMIN;
     }
 
+    //Este método informa del nivel de batería con indicación visual y de texto
+    //y pregunta al usuario si desea mover AspiraDaw del lugar actual a la base de carga
+    //y cargar por completo.
     public static void modoCarga() {
         ImageIcon icono;
         if (bateria < 10) {
@@ -352,6 +381,10 @@ public class AspiraDaw {
         }
     }
 
+    //Menu de configuración en el que se puede configurar una vivienda desde cero,
+    //argar una vivienda por defecto desde un txt, introducir manualmente el nivel
+    //de batería o reiniciar el estado de limpieza de las estancias sin tener
+    //que cerrar la ejecucion del programa
     public static void configuracion() {
         int opcion;
         boolean repite = true;
@@ -395,6 +428,7 @@ public class AspiraDaw {
         } while (repite);
     }
 
+    //Metodo del menu de configuración que va solicitando los datos para crear una vivienda manualmente.
     public static void creaVivienda() {
         do {
             Object objeto = JOptionPane.showInputDialog(null,
@@ -458,6 +492,7 @@ public class AspiraDaw {
         }
     }
 
+    //Metodo auxiliar que comprueba si se puede parsear un texto como double para evitar excepciones
     public static boolean isParsable(String texto) {
         try {
             Integer.parseInt(texto);
@@ -467,6 +502,8 @@ public class AspiraDaw {
         }
     }
 
+    //Ventana de salida del programa que da la opcion de guardar los cambios de 
+    //la vivienda en save.txt o salir sin guardar nada.
     public static boolean menuSalir() {
         int opcion;
         boolean repite = true;
@@ -500,6 +537,7 @@ public class AspiraDaw {
         return true;
     }
 
+    //Guarda todos los datos de la vivienda actualmente en uso en el archivo save.txt
     public static void guardaVivienda() {
         File archivo = new File("src/main/resources/saves/save.txt");
 
@@ -521,6 +559,8 @@ public class AspiraDaw {
         }
     }
 
+    //Este método crea un String con código html mediante varios bucles con toda la
+    //información de la vivienda que aparece en el menú principal
     public static String creaEstado() {
         String estado, lugar = "", cuantoTiempo = "";
         char SIMBOLO = 9670;
@@ -572,7 +612,7 @@ public class AspiraDaw {
         estado = estado + "</ul></td><td>";
 
         for (int i = 0; i < cantidadEstancia; i++) {
-            estado = estado + estancia[i].getSuperficie() + " m<sup>2</sup><br/>";
+            estado = estado + estancia[i].getSuperficie() + " m2<br/>";
         }
         estado = estado + "</td><td>";
 
@@ -612,6 +652,7 @@ public class AspiraDaw {
         return estado;
     }
 
+    //Este método es llamado para informar siempre que hay un mensaje de error en el programa
     public static void mensajeError(String mensaje) {
         JOptionPane.showOptionDialog(
                 null,
@@ -623,6 +664,8 @@ public class AspiraDaw {
                 new Object[]{"Ok"}, null);
     }
 
+    //Este método calcula la diferencia entre la fecha de limpieza de una estancia y ahora
+    //es usado en el menú principal para informar
     public static long[] calculaTiempo(int i) {
         long[] tiempo = new long[5];
         LocalDateTime ahora = LocalDateTime.now();

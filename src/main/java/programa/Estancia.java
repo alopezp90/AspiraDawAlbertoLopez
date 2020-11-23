@@ -6,6 +6,8 @@ import java.time.LocalDateTime;
  * @author Alberto López Puertas
  * <alopezp90@gmail.com>
  */
+
+//Constructor de Estancia
 public class Estancia {
 
     private int tipo, superficie;
@@ -26,6 +28,8 @@ public class Estancia {
         this.fecha = null;
     }
 
+    //Métodos setter y getter para el objeto Estancia
+    
     public int getTipo() {
         return tipo;
     }
