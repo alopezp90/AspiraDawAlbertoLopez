@@ -418,7 +418,7 @@ public class AspiraDaw {
                         if (bateria < 3 || bateria > 100) {
                             mensajeError("Introduzca un valor de batería de entre 3 y 100.");
                         }
-                    } while (bateria >= 3 && bateria <= 100);
+                    } while (bateria < 3 || bateria > 100);
                     break;
                 case 3:
                     Arrays.fill(estadoEstancia, false);
